@@ -18,7 +18,7 @@ const register = async (req, res) => {
     //   return res.status(400).json({ errors: errors.array() });
     // }
 
-    const { name, phoneNumber, gender, address, latitude, longitude } = req.body;
+    const { name, phoneNumber, gender, address, latitude, longitude, profilePhoto } = req.body;
 
     let user = await User.findOne({ phoneNumber });
     if (user && user.smsVerified) {
@@ -34,6 +34,9 @@ const register = async (req, res) => {
       user.address = address;
       user.smsCode = smsCode;
       user.smsCodeExpiry = smsCodeExpiry;
+      if (profilePhoto) {
+        user.profilePhoto = profilePhoto;
+      }
       // Update location if provided
       if (latitude && longitude) {
         user.location = {
@@ -51,6 +54,11 @@ const register = async (req, res) => {
         smsCodeExpiry,
         smsVerified: false
       };
+
+      // Add profile photo if provided
+      if (profilePhoto) {
+        userData.profilePhoto = profilePhoto;
+      }
 
       // Add location if provided
       if (latitude && longitude) {

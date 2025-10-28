@@ -109,9 +109,9 @@ const updateProfile = async (req, res) => {
     // if (!errors.isEmpty()) {
     //   return res.status(400).json({ errors: errors.array() });
     // }
-    
-    const { name, bio, profilePhoto, address } = req.body;
-    const userId = req.body.userId;
+
+    const { name, bio, profilePhoto, address, aboutme, album, gender } = req.body;
+    const userId = req.body.userId || req.user?._id;
     console.log('userId=========', userId);
 
     const updateData = {};
@@ -119,6 +119,9 @@ const updateProfile = async (req, res) => {
     if (bio !== undefined) updateData.bio = bio;
     if (profilePhoto) updateData.profilePhoto = profilePhoto;
     if (address) updateData.address = address;
+    if (aboutme !== undefined) updateData.aboutme = aboutme;
+    if (album !== undefined) updateData.album = album;
+    if (gender && ['male', 'female', 'other'].includes(gender)) updateData.gender = gender;
 
     const user = await User.findByIdAndUpdate(
       userId,
@@ -126,6 +129,7 @@ const updateProfile = async (req, res) => {
       { new: true }
     ).select('-smsCode -smsCodeExpiry');
 
+    console.log("===========",updateData);
     res.json({
       message: 'プロフィールを更新しました',
       user
@@ -164,13 +168,15 @@ const setOnlineStatus = async (req, res) => {
   } catch (error) {
     console.error('Set online status error:', error);
     res.status(500).json({ error: 'ステータスの更新中にサーバーエラーが発生しました' });
+    console.log('Set online status error:-----------------', error);
+
   }
 };
 
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({})
-      .select('name gender location phoneNumber isOnline profilePhoto bio address matchCount actualMeetCount lastSeen')
+      .select('name gender location phoneNumber isOnline profilePhoto bio aboutme album address matchCount actualMeetCount lastSeen')
       .sort({ createdAt: -1 });
 
     res.json({
@@ -198,7 +204,9 @@ const profileValidation = [
   body('name').optional().trim().isLength({ min: 2, max: 50 }).withMessage('名前は2文字以上50文字以下で入力してください'),
   body('bio').optional().isLength({ max: 500 }).withMessage('自己紹介は500文字以下で入力してください'),
   body('profilePhoto').optional().isURL().withMessage('有効な写真URLを入力してください'),
-  body('address').optional().trim().isLength({ min: 5, max: 200 }).withMessage('住所は5文字以上200文字以下で入力してください')
+  body('address').optional().trim().isLength({ min: 5, max: 200 }).withMessage('住所は5文字以上200文字以下で入力してください'),
+  body('aboutme').optional().isLength({ max: 1000 }).withMessage('About meは1000文字以下で入力してください'),
+  body('album').optional().isArray({ max: 5 }).withMessage('アルバムは最大5枚までです')
 ];
 
 module.exports = {

@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     },
     coordinates: {
       type: [Number],
-      default: [0, 0]
+      default: [0.0, 0.0]
     }
   },
   profilePhoto: {
@@ -40,6 +40,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
     maxlength: 500
+  },
+  aboutme: {
+    type: String,
+    default: '',
+    maxlength: 1000
+  },
+  album: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: function(v) {
+        return v.length <= 5;
+      },
+      message: 'Album cannot have more than 5 images'
+    }
   },
   isOnline: {
     type: Boolean,

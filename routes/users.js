@@ -17,8 +17,9 @@ const router = express.Router();
 router.get('/nearby', auth, nearbyUsersValidation, getNearbyUsers);
 router.get('/all', getAllUsers);
 router.post('/update-location', auth, locationValidation, updateLocation);
-router.get('/profile/:id', auth, getUserProfile);
-router.put('/profile',  updateProfile);
+router.get('/profile/:id',  getUserProfile);
+router.put('/profile', auth, profileValidation, updateProfile);
+router.post('/update-profile',  updateProfile);
 router.post('/status', auth, setOnlineStatus);
 
 module.exports = router;
